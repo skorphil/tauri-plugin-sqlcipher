@@ -11,3 +11,6 @@ Errors vith :
 - in wrapper.rs `query.bind(value); // the trait bound serde_json::Value: sqlx::Encode<'_, Sqlite> is not satisfied the following other types implement trait `
 
 
+```
+npm i tauri-plugin-sqlcipher-api
+```
