@@ -1,0 +1,41 @@
+[package]
+name = "tauri-plugin-sqlcipher"
+version = "0.1.0"
+description = ""
+edition = "2021"
+rust-version = "1.77.2"
+exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
+links = "tauri-plugin-sqlcipher"
+
+[dependencies]
+tauri = { version = "2.3.1" }
+serde = "1.0"
+thiserror = "2"
+futures-core = "0.3"
+# sqlx = { version = "0.8", features = ["json", "time"] }
+libsqlite3-sys = { version = "0.30.1", features = [
+    "bundled-sqlcipher"
+] }
+time = "0.3"
+tokio = { version = "1", features = ["sync"] }
+indexmap = { version = "2", features = ["serde"] }
+log = "0.4"
+serde_json = "1"
+
+[build-dependencies]
+tauri-plugin = { version = "2.0.4", features = ["build"] }
+
+[dependencies.sqlx]
+version = "0.8.3"
+default-features = false
+features = [
+    "runtime-tokio-rustls",
+    "macros",
+    "sqlite",
+    "migrate"
+]
+
+[features]
+sqlite = ["sqlx/sqlite", "sqlx/runtime-tokio"]
+mysql = ["sqlx/mysql", "sqlx/runtime-tokio-rustls"]
+postgres = ["sqlx/postgres", "sqlx/runtime-tokio-rustls"]
