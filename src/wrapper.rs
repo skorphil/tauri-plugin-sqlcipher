@@ -18,7 +18,9 @@ use sqlx::MySql;
 #[cfg(feature = "postgres")]
 use sqlx::Postgres;
 #[cfg(feature = "sqlite")]
-use sqlx::Sqlite::{SqliteConnectOptions, SqlitePoolOptions};
+use sqlx::{Sqlite, sqlite::{SqliteConnectOptions, SqlitePoolOptions}};
+use sqlx::ConnectOptions;
+use std::str::FromStr;
 
 use crate::LastInsertId;
 
@@ -38,7 +40,7 @@ impl DbPool {
     pub(crate) async fn connect<R: Runtime>(
         conn_url: &str,
         _app: &AppHandle<R>,
-        _encryption_key: &str,
+        encryption_key: &str,
     ) -> Result<Self, crate::Error> {
         match conn_url
             .split_once(':')
@@ -61,10 +63,10 @@ impl DbPool {
                 }
 
                 let sql_options = SqliteConnectOptions::from_str(conn_url)?
-                    .pragma("key", encryption_key.to_owned())
+                    .pragma("key", encryption_key.to_owned()) // cannot find value `encryption_key` in this scope
                     .create_if_missing(true);
 
-                let pool = SqlitePool::connect_with(sql_options).await?;
+                let pool = Pool::connect_with(sql_options).await?; // use of undeclared type `SqlitePool`
                 Ok(Self::Sqlite(pool))
             }
             #[cfg(feature = "mysql")]
@@ -131,7 +133,7 @@ impl DbPool {
                 let mut query = sqlx::query(&_query);
                 for value in _values {
                     if value.is_null() {
-                        query = query.bind(None::<JsonValue>);
+                        query = query.bind(None::<JsonValue>); // Json values not allowed
                     } else if value.is_string() {
                         query = query.bind(value.as_str().unwrap().to_owned())
                     } else if let Some(number) = value.as_number() {
